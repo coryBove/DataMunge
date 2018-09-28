@@ -13,7 +13,7 @@ namespace DataMunge
         {            
             string line = string.Empty;
             List<Day> days = new List<Day>();
-            StreamReader weatherFile = new StreamReader(@"C:\Users\mini-veg\source\repos\DataMunge\DataMunge\weather.txt");
+            StreamReader weatherFile = new StreamReader(@"C:\Users\cbovein1\Desktop\weather.txt");
             string headerLine = weatherFile.ReadLine();
             while ((line = weatherFile.ReadLine()) != null)
             {
@@ -22,10 +22,21 @@ namespace DataMunge
             }
 
             days = days.OrderBy(p => p.ChanceOfPrecipitation).Where(t => t.High <= 85 && t.Low >= 70).ToList();            
-            PrintAllDays(days);                       
+            //PrintAllDays(days);
 
-            if (args.Length == 1)
+            int n;
+            if (args.Length >= 1)
             {
+                if (!int.TryParse(args[0], out n))
+                {
+                    Console.WriteLine("Please input 1 positive integer");
+                    return;
+                }
+                if (int.Parse(args[0]) < 1 || args.Length > 1)
+                {
+                    Console.WriteLine("Please input 1 positive integer");
+                    return;
+                }
                 days = days.OrderBy(d => d.DayOfMonth).ToList();
                 List<Day> longestListOfVacationDays = LongestConsecutiveSubsequence(days);
                 PrintKCombs(GetConsecutiveIntegers(days), int.Parse(args[0]));
@@ -38,15 +49,24 @@ namespace DataMunge
 
         private static void PrintKCombs(IEnumerable<List<Day>> consecutiveDays, int length)
         {            
-            Console.WriteLine("Vacation combinations:");                        
+            Console.WriteLine(string.Format("Vacation combinations of {0}:", length));
+            List<List<Day>> filtered = new List<List<Day>>();
             foreach (var comb in consecutiveDays)
             {                
-                var kCombs = GetKCombs(comb, length);                
-                foreach (var d in kCombs.SelectMany(l => l.Select(o => o)))
+                var kCombs = GetKCombs(comb, length);
+                
+                foreach(var c in kCombs)
                 {
-                    Console.WriteLine(string.Format("{0} the {1} day of the month.", d.DayOfWeek, ConvertNumToOrdinal(d.DayOfMonth)));
-                }
-            }            
+                    if (!c.Select((i, j) => i.DayOfMonth - j).Distinct().Skip(1).Any())
+                    {
+                        filtered.Add(c.ToList());
+                    }
+                }                                                
+            }
+            foreach (var d in filtered.SelectMany(l => l.Select(o => o)))
+            {
+                Console.WriteLine(string.Format("{0} the {1} day of the month.", d.DayOfWeek, ConvertNumToOrdinal(d.DayOfMonth)));
+            }
         }
 
         private static IEnumerable<IEnumerable<T>> GetKCombs<T>(List<T> list, int length) where T : IComparable
