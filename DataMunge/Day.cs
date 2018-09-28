@@ -6,18 +6,24 @@ using System.Threading.Tasks;
 
 namespace DataMunge
 {
-    class Day
+    class Day : IComparable
     {
 
-        public string DayOfMonth { get; set; }
+        public int DayOfMonth { get; set; }
         public string DayOfWeek { get; set; }
         public double High { get; set; }
         public double Low { get; set; }
         public int ChanceOfPrecipitation { get; set; }
 
+        public int CompareTo(Object o)
+        {
+            Day d = o as Day;
+            return DayOfMonth.CompareTo(d.DayOfMonth);
+        }
+
         public Day(string dayOfMonth, string dayOfWeek, string high, string low, string chanceOfPrecipitation)
         {
-            DayOfMonth = ConvertNumToOrdinal(dayOfMonth);
+            DayOfMonth = int.Parse(dayOfMonth);
             DayOfWeek = ConvertLetterToWord(dayOfMonth);
             High = CelsiusToFarenheit(high);
             Low = CelsiusToFarenheit(low);
@@ -27,21 +33,7 @@ namespace DataMunge
         private double CelsiusToFarenheit(string celsius)
         {
             return double.Parse(celsius) * 9.0 / 5.0 + 32.0;
-        }
-
-        private string ConvertNumToOrdinal(string dayOfMonth)
-        {            
-            string day = dayOfMonth;
-            if (dayOfMonth.EndsWith("11")) day = dayOfMonth + "th";
-            else if (dayOfMonth.EndsWith("12")) day = dayOfMonth + "th";
-            else if (dayOfMonth.EndsWith("11")) day = dayOfMonth + "th";
-            else if (dayOfMonth.EndsWith("1")) day = dayOfMonth + "st";
-            else if (dayOfMonth.EndsWith("2")) day = dayOfMonth + "nd";
-            else if (dayOfMonth.EndsWith("3")) day = dayOfMonth + "rd";
-            else day = dayOfMonth + "th";
-
-            return day;
-        }
+        }        
 
         private string ConvertLetterToWord(string dayOfMonth)
         {
